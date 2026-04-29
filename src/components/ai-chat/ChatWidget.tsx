@@ -11,7 +11,7 @@ import {
 import { TelegramIcon } from "@/components/TelegramIcon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
+// Using native scrollable div instead of Radix ScrollArea for reliability
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAiChat } from "@/hooks/useAiChat";
 import { cn } from "@/lib/utils";
@@ -136,8 +136,8 @@ export function ChatWidget() {
         </div>
 
         {/* Messages */}
-        <ScrollArea className="flex-1 px-4 py-3" ref={scrollRef}>
-          <div className="flex flex-col gap-3">
+        <div className="flex-1 overflow-y-auto px-4 py-3" ref={scrollRef}>
+          <div className="flex flex-col gap-3 min-h-0">
             {messages.map((msg) => (
               <div
                 key={msg.id}
@@ -198,7 +198,7 @@ export function ChatWidget() {
               </div>
             )}
           </div>
-        </ScrollArea>
+        </div>
 
         {/* Input */}
         <form
