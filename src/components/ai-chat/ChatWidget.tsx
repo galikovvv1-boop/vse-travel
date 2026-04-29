@@ -40,14 +40,22 @@ export function ChatWidget() {
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
-    if (scrollRef.current) {
-      const viewport = scrollRef.current.querySelector(
-        "[data-slot='scroll-area-viewport']"
-      );
-      if (viewport) {
-        viewport.scrollTop = viewport.scrollHeight;
-      }
-    }
+    const timer = setTimeout(() => {
+      requestAnimationFrame(() => {
+        if (scrollRef.current) {
+          const viewport = scrollRef.current.querySelector(
+            "[data-slot='scroll-area-viewport']"
+          );
+          if (viewport) {
+            viewport.scrollTo({
+              top: viewport.scrollHeight,
+              behavior: "smooth",
+            });
+          }
+        }
+      });
+    }, 50);
+    return () => clearTimeout(timer);
   }, [messages, isLoading]);
 
   // Focus input when chat opens
