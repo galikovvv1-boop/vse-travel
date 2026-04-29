@@ -10,6 +10,8 @@ import { Paths } from "@contracts/constants";
 export const app = new Hono<{ Bindings: HttpBindings }>();
 
 app.use(bodyLimit({ maxSize: 50 * 1024 * 1024 }));
+
+app.get("/api/health", (c) => c.json({ ok: true, timestamp: Date.now() }));
 app.get(Paths.oauthCallback, createOAuthCallbackHandler());
 const trpcHandler = async (c: Context) => {
   const path = c.req.path;
