@@ -12,7 +12,7 @@ import Preloader from './sections/Preloader'
 import BusDetail from './pages/BusDetail'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
-import { ChatWidget } from './components/ai-chat/ChatWidget'
+import ChatWidget from './components/ai-chat/ChatWidget'
 
 function ScrollToTop() {
   const { pathname } = useLocation()

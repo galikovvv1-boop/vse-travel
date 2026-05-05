@@ -1,228 +1,94 @@
-import { useRef, useEffect } from "react";
-import {
-  MessageCircle,
-  X,
-  Send,
-  Bot,
-  User,
-  Trash2,
-  Loader2,
-} from "lucide-react";
-import { TelegramIcon } from "@/components/TelegramIcon";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-// Using native scrollable div instead of Radix ScrollArea for reliability
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useAiChat } from "@/hooks/useAiChat";
+import { useState, useCallback } from "react";
+import { X, MessageSquare, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-function formatTime(date: Date) {
-  return date.toLocaleTimeString("ru-RU", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
+export default function ChatWidget() {
+  const [isOpen, setIsOpen] = useState(false);
 
-export function ChatWidget() {
-  const {
-    messages,
-    isOpen,
-    toggleOpen,
-    input,
-    setInput,
-    handleSubmit,
-    isLoading,
-    clearChat,
-  } = useAiChat();
-
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  // Auto-scroll to bottom on new messages
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      requestAnimationFrame(() => {
-        if (scrollRef.current) {
-          const viewport = scrollRef.current.querySelector(
-            "[data-slot='scroll-area-viewport']"
-          );
-          if (viewport) {
-            viewport.scrollTo({
-              top: viewport.scrollHeight,
-              behavior: "smooth",
-            });
-          }
-        }
-      });
-    }, 50);
-    return () => clearTimeout(timer);
-  }, [messages, isLoading]);
-
-  // Focus input when chat opens
-  useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 100);
-    }
-  }, [isOpen]);
+  const toggleOpen = useCallback(() => {
+    setIsOpen((prev) => !prev);
+  }, []);
 
   return (
     <>
-      {/* Floating toggle button */}
-      <Button
+      {/* Toggle Button */}
+      <button
         onClick={toggleOpen}
-        size="icon-lg"
         className={cn(
-          "fixed bottom-6 right-6 z-50 rounded-full shadow-lg transition-transform hover:scale-105",
-          isOpen && "rotate-90 scale-0 opacity-0 pointer-events-none"
+          "fixed bottom-6 right-6 z-[100] flex items-center justify-center",
+          "w-14 h-14 bg-primary text-primary-foreground rounded-full",
+          "transition-all duration-300 hover:scale-110 hover:shadow-xl",
+          "shadow-lg"
         )}
         aria-label={isOpen ? "Закрыть чат" : "Открыть чат"}
       >
-        <MessageCircle className="size-6" />
-      </Button>
-
-      {/* Chat window */}
-      <div
-        className={cn(
-          "fixed bottom-6 right-6 z-50 flex flex-col w-[90vw] max-w-[380px] h-[500px] max-h-[80vh] bg-background rounded-2xl shadow-2xl border transition-all duration-300 origin-bottom-right",
-          isOpen
-            ? "scale-100 opacity-100 translate-y-0"
-            : "scale-0 opacity-0 translate-y-4 pointer-events-none"
+        {isOpen ? (
+          <X className="w-5 h-5" />
+        ) : (
+          <MessageSquare className="w-5 h-5" />
         )}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b bg-primary/5 rounded-t-2xl">
-          <div className="flex items-center gap-2.5">
-            <div className="flex items-center justify-center size-9 rounded-full bg-primary text-primary-foreground">
-              <Bot className="size-5" />
+      </button>
+
+      {/* Chat Window */}
+      {isOpen && (
+        <div
+          className="fixed bottom-24 right-6 z-[100] flex flex-col bg-background border border-border shadow-2xl rounded-lg overflow-hidden"
+          style={{
+            width: "clamp(320px, 90vw, 380px)",
+            height: "auto",
+            maxHeight: "500px",
+          }}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 py-3 bg-primary border-b">
+            <div className="flex items-center gap-2">
+              <Send className="w-4 h-4 text-primary-foreground" />
+              <span className="text-sm font-medium text-primary-foreground">
+                Консультант
+              </span>
             </div>
-            <div>
-              <p className="text-sm font-semibold leading-tight">
-                Менеджер Travel
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {isLoading ? "Печатает..." : "Онлайн"}
-              </p>
-            </div>
+            <button
+              onClick={toggleOpen}
+              className="text-primary-foreground/70 hover:text-primary-foreground transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
-          <div className="flex items-center gap-1">
+
+          {/* Message */}
+          <div className="flex flex-col gap-4 px-5 py-6">
+            <p className="text-sm text-foreground leading-relaxed">
+              🤖 Бот временно не работает.
+            </p>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Обратитесь к менеджеру — мы ответим быстро:
+            </p>
+
             <a
               href="https://t.me/INTELEGENT_Spb"
               target="_blank"
               rel="noopener noreferrer"
-              title="Написать в Telegram"
-              className="inline-flex items-center justify-center size-8 rounded-md text-muted-foreground hover:text-foreground transition-colors"
+              className={cn(
+                "inline-flex items-center justify-center gap-2 w-full px-4 py-2.5",
+                "bg-[#229ED9] text-white text-sm font-medium rounded-md",
+                "hover:bg-[#1a8bc2] transition-colors"
+              )}
             >
-              <TelegramIcon className="size-5" />
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
+              </svg>
+              Написать в Telegram
             </a>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={clearChat}
-              title="Очистить чат"
-              className="text-muted-foreground hover:text-foreground"
+
+            <a
+              href="tel:+79052794030"
+              className="text-center text-sm text-foreground hover:text-primary transition-colors"
             >
-              <Trash2 className="size-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={toggleOpen}
-              title="Закрыть"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <X className="size-4" />
-            </Button>
+              +7 (905) 279-40-30
+            </a>
           </div>
         </div>
-
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-4 py-3" ref={scrollRef}>
-          <div className="flex flex-col gap-3 min-h-0">
-            {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={cn(
-                  "flex gap-2.5",
-                  msg.role === "user" ? "flex-row-reverse" : "flex-row"
-                )}
-              >
-                <Avatar className="size-7 mt-0.5">
-                  <AvatarFallback
-                    className={cn(
-                      "text-[10px] font-medium",
-                      msg.role === "assistant"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted"
-                    )}
-                  >
-                    {msg.role === "assistant" ? (
-                      <Bot className="size-3.5" />
-                    ) : (
-                      <User className="size-3.5" />
-                    )}
-                  </AvatarFallback>
-                </Avatar>
-                <div
-                  className={cn(
-                    "flex flex-col gap-0.5 max-w-[75%]",
-                    msg.role === "user" ? "items-end" : "items-start"
-                  )}
-                >
-                  <div
-                    className={cn(
-                      "px-3 py-2 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap",
-                      msg.role === "assistant"
-                        ? "bg-muted text-foreground rounded-tl-sm"
-                        : "bg-primary text-primary-foreground rounded-tr-sm"
-                    )}
-                  >
-                    {msg.content}
-                  </div>
-                  <span className="text-[10px] text-muted-foreground px-1">
-                    {formatTime(msg.createdAt)}
-                  </span>
-                </div>
-              </div>
-            ))}
-
-            {isLoading && (
-              <div className="flex gap-2.5">
-                <Avatar className="size-7 mt-0.5">
-                  <AvatarFallback className="bg-primary text-primary-foreground text-[10px]">
-                    <Bot className="size-3.5" />
-                  </AvatarFallback>
-                </Avatar>
-                <div className="bg-muted rounded-2xl rounded-tl-sm px-3 py-2.5">
-                  <Loader2 className="size-4 animate-spin text-muted-foreground" />
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Input */}
-        <form
-          onSubmit={handleSubmit}
-          className="flex items-center gap-2 px-3 py-3 border-t"
-        >
-          <Input
-            ref={inputRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Напишите сообщение..."
-            className="flex-1 h-9 rounded-full px-4 text-sm"
-            disabled={isLoading}
-          />
-          <Button
-            type="submit"
-            size="icon"
-            disabled={isLoading || !input.trim()}
-            className="size-9 rounded-full shrink-0"
-          >
-            <Send className="size-4" />
-          </Button>
-        </form>
-      </div>
+      )}
     </>
   );
 }
